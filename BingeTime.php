@@ -1,10 +1,15 @@
+<html>
+<head>
+</head>
+<body>
 <?php
 
 # Includes the api key from a separate file
 include 'apikey.php';
 
-# The name of the show you're looking up
-$showname = "One%20Piece";
+# Get the show name and fix spaces
+$showname = $_POST["showname"];
+$showname = str_replace(" ", "%20", $showname);
 
 # Defines a function to retrieve a JWT token
 function getToken() {
@@ -88,16 +93,25 @@ function getRuntime($token, $id) {
 	return json_decode($response)->{'data'}->{'runtime'};
 }
 
-# Get a JWT token
-$token = getToken();
-# Get the show id
-$id = showLookup($token, "$showname");
-# Get the episode count
-$count = getEpisodeCount($token, $id);
-# Get the listed runtime
-$runtime = getRuntime($token, $id);
-# Calculate total runtime and print it out in terms of hours and minutes
-$totalruntime = $runtime*$count;
-print(floor($totalruntime/60)." hours ".($totalruntime%60)." minutes.");
+function main() {
+	global $showname;
+	# Get a JWT token
+	$token = getToken();
+	# Get the show id
+	$id = showLookup($token, "$showname");
+	# Get the episode count
+	$count = getEpisodeCount($token, $id);
+	# Get the listed runtime
+	$runtime = getRuntime($token, $id);
+	# Calculate total runtime and print it out in terms of hours and minutes
+	$totalruntime = $runtime*$count;
+	print($count." episodes.<br>");
+	print(floor($totalruntime/60)." hours ".($totalruntime%60)." minutes.<br>");
+	print(round($totalruntime/1440, 2)." days.<br>");
+}
+
+main();
 
 ?>
+</body>
+</html
