@@ -54,19 +54,21 @@ function showLookup($token, $showname) {
 
 # Defines a function to count the episodes of a show
 function getEpisodeCount($token, $id) {
-	$page = 1;
 	# Sets the API endpoint
 	$url = "https://api.thetvdb.com/series/$id/episodes?page=$page";
 	# Retrieve the JSON response
 	$response = makeRequest($token, $url);
 	$count = 0;
-	# Iterate over episodes counting every episodes with an "aired season" greater than 0
+	$page = 1;
+	# Loop while there is data in the JSON response
 	while (json_decode($response)->{'data'}) {
+		# Iterate over episodes counting every episodes with an "aired season" greater than 0
 		foreach (json_decode($response)->{'data'} as $episode) {
 			if ($episode->{'airedSeason'} > 0) {
 				$count++;
 			}
 		}
+		# Increase the page count and make a new request for the new page 
 		$page++;
 		$url = "https://api.thetvdb.com/series/$id/episodes?page=$page";
 		$response = makeRequest($token, $url);
