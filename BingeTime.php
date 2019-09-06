@@ -4,7 +4,7 @@
 include 'apikey.php';
 
 # The name of the show you're looking up
-$showname = "Fullmetal%20Alchemist%20Brotherhood";
+$showname = "One%20Piece";
 
 # Defines a function to retrieve a JWT token
 function getToken() {
@@ -54,18 +54,24 @@ function showLookup($token, $showname) {
 
 # Defines a function to count the episodes of a show
 function getEpisodeCount($token, $id) {
+	$page = 1;
 	# Sets the API endpoint
-	$url = "https://api.thetvdb.com/series/$id/episodes";
+	$url = "https://api.thetvdb.com/series/$id/episodes?page=$page";
 	# Retrieve the JSON response
 	$response = makeRequest($token, $url);
 	$count = 0;
 	# Iterate over episodes counting every episodes with an "aired season" greater than 0
-	foreach (json_decode($response)->{'data'} as $episode) {
-		if ($episode->{'airedSeason'} > 0) {
-			$count++;
+	while (json_decode($response)->{'data'}) {
+		foreach (json_decode($response)->{'data'} as $episode) {
+			if ($episode->{'airedSeason'} > 0) {
+				$count++;
+			}
 		}
-	}
-	
+		$page++;
+		$url = "https://api.thetvdb.com/series/$id/episodes?page=$page";
+		$response = makeRequest($token, $url);
+	}		
+
 	# Return the sum of episodes
 	return $count;
 }
